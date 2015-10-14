@@ -8,7 +8,11 @@ plotDisplayChoiceList <- list(
   Pathway=c("Selected genes"="mRNA",
             "miRNAs targeting selected genes"="miRNA",
             "Methylation probes targeting selected genes"="Methylation"),
-   
+  
+  DEGenes=c("Selected genes"="mRNA",
+            "miRNAs targeting selected genes"="miRNA",
+            "Methylation probes targeting selected genes"="Methylation"),
+  
   miRNA=c("Selected miRNAs"="miRNA",
           "Genes targeted by selected miRNAs"="mRNA",
           "Methylation probes for genes targeted by selected miRNAs"="Methylation"),
@@ -47,8 +51,13 @@ shinyServer(
                           actionButton("refreshGene", "Refresh")),
              Pathway=tagList(p(class = "text-info", "Select a pathway (from BioCarta, KEGG, or Reactome)."),
                              selectInput("selected_pathways", label=NULL,
-                                 choices = names(pathways_list),
-                                 selectize=T, multiple=F)),
+                                         choices = names(pathways_list),
+                                         selectize=T, multiple=F)),
+             DEGenes=tagList(p(class = "text-info", 
+                               "Select a set of differentially expressed genes."),
+                             selectInput("selected_degenes", label=NULL,
+                                         choices = names(sigGenesList),
+                                         selectize=T, multiple=F)),
              miRNA=tagList(p(class = "text-info",
                              "Enter miRNA names."),
                            tags$textarea(paste0(sample_miRNAs, collapse="\n"),
@@ -187,6 +196,7 @@ shinyServer(
       mirnaList <- isolate(input$custom_mirna_list)
       methylList <- isolate(input$custom_methyl_list)
       selectedPathway <- input$selected_pathways
+      selectedDEGenes <- input$selected_degenes
       
       curr_filter_type <- paste(input$custom_search, input$plotdisplay, sep="_")
       flog.debug(curr_filter_type, name="server")
@@ -198,6 +208,9 @@ shinyServer(
         featureList <- as.character(unlist(pathways_list[selectedPathway]))
         featureList <- clean_list(featureList, change_case=toupper)
         featureList <- convert_to_HUGOIds(featureList)
+      }
+      else if (curr_filter_type == "DEGenes_mRNA") {
+        featureList <- sigGenesList[[selectedDEGenes]]
       }
       else if (curr_filter_type == "Gene_miRNA") {
         featureList <- clean_list(geneList, change_case=toupper)

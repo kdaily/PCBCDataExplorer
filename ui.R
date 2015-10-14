@@ -102,7 +102,7 @@ myBody <-dashboardBody(
 
                selectInput("custom_search",
                            label="Select feature type", #h6(""),
-                           choices=c("Gene", "Pathway", "miRNA", "Methylation"),
+                           choices=c("Gene", "Pathway", "DEGenes", "miRNA", "Methylation"),
                            selectize=T, multiple=F, selected="mRNA"),
                
                uiOutput("featureui"),
